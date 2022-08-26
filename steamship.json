@@ -1,0 +1,30 @@
+{
+  "type": "app",
+  "name": "chat-analytics-app",
+  "handle": "chat-analytics-app",
+  "version": "0.0.15",
+  "description": "",
+  "author": "",
+  "entrypoint": "src.api.handler",
+  "build_config": {
+    "ignore": [
+      "tests",
+      "notebooks"
+    ]
+  },
+  "configTemplate": {
+    "oneai_api_key": {
+      "type": "string",
+      "description": "Your bearer token to access the One AI API"
+    },
+    "hf_api_bearer_token": {
+      "type": "string",
+      "description": "Your bearer token to access the Hugging Face API"
+    },
+    "hf_model_path": {
+      "type": "string",
+      "description": "The model path of the HF model you want to use for intent classification.",
+      "default": "typeform/distilbert-base-uncased-mnli"
+    }
+  }
+}
