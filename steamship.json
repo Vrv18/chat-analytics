@@ -1,11 +1,11 @@
 {
   "type": "app",
-  "name": "chat-analytics-app",
-  "handle": "chat-analytics-app",
-  "version": "0.0.18",
-  "description": "",
+  "handle": "chat-analytics",
+  "version": "1.0.0",
+  "description": "For companies building software to help support reps manage their community chatrooms. Clusters a chat logs into topic groups and extracts sentiment and entities.",
   "author": "Steamship Inc.",
-  "entrypoint": "src.api.handler",
+  "entrypoint": "api.handler",
+  "public": true,
   "build_config": {
     "ignore": [
       "tests",
