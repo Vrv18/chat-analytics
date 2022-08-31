@@ -6,36 +6,28 @@ from typing import Any, Dict, List
 from pydantic import parse_obj_as
 from steamship import Block, File, PluginInstance, Steamship, Tag
 from steamship.app import App, Response, create_handler, post
-from steamship.plugin.config import Config
 
 from api_spec import Intent, Message, Sentiment
+from keys import HF_API_BEARER_TOKEN, HF_MODEL_PATH, ONEAI_API_KEY
 
 PRIORITY_LABEL = "priority"
-
-
-class ChatAnalyticsAppConfig(Config):
-    """Config object containing required configuration parameters to initialize a MeetingSummaryApp."""
-
-    oneai_api_key: str
-    hf_api_bearer_token: str
-    hf_model_path: str = "typeform/distilbert-base-uncased-mnli"
 
 
 class ChatAnalyticsApp(App):
     """App that transcribes and summarizes audio using Amazon Transcribe and OneAI skills."""
 
-    ONEAI_TAGGER_HANDLE = "oneai-tagger-plugin"
+    ONEAI_TAGGER_HANDLE = "oneai-tagger"
     ZERO_SHOT_TAGGER_HANDLE = "tagger-zero-shot"
 
     def __init__(self, client: Steamship = None, config: Dict[str, Any] = None):
         super().__init__(client, config)
-        self.config = ChatAnalyticsAppConfig(**self.config)
 
         self.oneai_tagger = PluginInstance.create(
             client,
             plugin_handle=self.ONEAI_TAGGER_HANDLE,
+            handle=self.ONEAI_TAGGER_HANDLE,
             config={
-                "api_key": self.config.oneai_api_key,
+                "api_key": ONEAI_API_KEY,
                 "skills": ",".join(["dialogue-segmentation", "sentiments"]),
             },
         ).data
@@ -43,9 +35,10 @@ class ChatAnalyticsApp(App):
         self.intent_tagger = PluginInstance.create(
             client,
             plugin_handle=self.ZERO_SHOT_TAGGER_HANDLE,
+            handle=self.ZERO_SHOT_TAGGER_HANDLE,
             config={
-                "hf_api_bearer_token": self.config.hf_api_bearer_token,
-                "hf_model_path": self.config.hf_model_path,
+                "hf_api_bearer_token": HF_API_BEARER_TOKEN,
+                "hf_model_path": HF_MODEL_PATH,
                 "labels": "hello,praise,complaint,question,request,explanation",
                 "tag_kind": "intent",
                 "multi_label": False,
@@ -170,13 +163,15 @@ class ChatAnalyticsApp(App):
 
     @post("add_examples")
     def add_examples(self, chat_stream: List[Message]) -> Response:
+        """Add examples for the AI to train on."""
         chat_stream = self._parse_input(chat_stream)
 
         File.create(
             self.client,
-            blocks=[Block.CreateRequest(text=message.text, tags=message.extract_tags())
-                    for message in chat_stream],
-
+            blocks=[
+                Block.CreateRequest(text=message.text, tags=message.extract_tags())
+                for message in chat_stream
+            ],
         )
         return Response(string="Successfully uploaded examples.")
 

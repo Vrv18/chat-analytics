@@ -50,11 +50,14 @@ class Message(BaseModel):
         return output
 
     def extract_tags(self):
+        """Extract from OneAI's API response."""
         return [
-            Tag.CreateRequest(kind="sentiments", name=self.sentiment.value if self.sentiment else ""),
+            Tag.CreateRequest(
+                kind="sentiments", name=self.sentiment.value if self.sentiment else ""
+            ),
             Tag.CreateRequest(kind="intent", name=self.intent.value if self.intent else ""),
-            Tag.CreateRequest(kind="root_message_id", name=str(self.root_message_id  or "")),
+            Tag.CreateRequest(kind="root_message_id", name=str(self.root_message_id or "")),
             Tag.CreateRequest(kind="timestamp", name=str(self.timestamp) if self.timestamp else ""),
             Tag.CreateRequest(kind="user_id", name=str(self.user_id or "")),
-            Tag.CreateRequest(kind="message_id", name=str(self.message_id  or "")),
+            Tag.CreateRequest(kind="message_id", name=str(self.message_id or "")),
         ]

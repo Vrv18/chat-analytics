@@ -31,7 +31,7 @@ CONVERSATIONS = [
             timestamp=datetime(2022, 6, 15, 16, 18, 33, 960),
             user_id="1",
             text="Thanks for getting back to us on the styling issue "
-                 "we had last week. Font colours are so important for productivity.",
+            "we had last week. Font colours are so important for productivity.",
             intent=Intent.PRAISE,
         ),
         Message(
@@ -51,7 +51,7 @@ CONVERSATIONS = [
             timestamp=datetime(2022, 6, 15, 16, 18, 36, 211),
             user_id="1",
             text="I want ab.bot to ignore thank you messages and stop "
-                 "asking our customers to assign messages to threads.",
+            "asking our customers to assign messages to threads.",
         ),
         Message(
             message_id="5",
@@ -83,7 +83,7 @@ def validate_response(chat_stream: List[Message], response: Response):
     last_root_message_id = None
     prediction_start_idx = 0
     for idx, (original_message, processed_message) in enumerate(
-            zip(chat_stream, processed_chat_stream)
+        zip(chat_stream, processed_chat_stream)
     ):
         if original_message.intent is None:
             assert processed_message.intent is not None
@@ -98,10 +98,10 @@ def validate_response(chat_stream: List[Message], response: Response):
         if original_message.root_message_id is None:
             assert processed_message.root_message_id is not None
             assert (
-                    last_root_message_id is None
-                    or processed_message.root_message_id == last_root_message_id
-                    or processed_message.root_message_id
-                    in {message.message_id for message in chat_stream[prediction_start_idx:]}
+                last_root_message_id is None
+                or processed_message.root_message_id == last_root_message_id
+                or processed_message.root_message_id
+                in {message.message_id for message in chat_stream[prediction_start_idx:]}
             )
         else:
             assert processed_message.root_message_id == original_message.root_message_id
@@ -110,6 +110,7 @@ def validate_response(chat_stream: List[Message], response: Response):
 
 
 def check_successful_storage(chat_stream, client):
+    """Check if the tags are correctly stored in the default space."""
     assert len(File.query(client, "all").data.files) == 1
     assert len(File.query(client, 'blocktag and kind "message_id"').data.files) == 1
     assert len(File.query(client, 'blocktag and kind "user_id"').data.files) == 1
@@ -123,7 +124,9 @@ def check_successful_storage(chat_stream, client):
 
         assert message.text == block.text
 
-        for property in {property for property in message.__dict__.keys() if property not in ("text",)}:
+        for property in {
+            property for property in message.__dict__.keys() if property not in ("text",)
+        }:
             property_kind = f"{property}s" if property == "sentiment" else property
             property_tags = [tag for tag in block.tags if tag.kind == property_kind]
             assert len(property_tags) == 1
@@ -135,9 +138,11 @@ def check_successful_storage(chat_stream, client):
 
 
 def delete_files_in_space(client: Steamship) -> None:
+    """Delete all files in the default space."""
     for file in File.list(client).data.files:
         file.delete()
 
 
 def check_if_space_is_empty(client):
+    """Check if default space is empty."""
     assert len(File.query(client, "all").data.files) == 0

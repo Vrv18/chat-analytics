@@ -1,15 +1,14 @@
 """Test zendesk-ticket-urgency via unit tests."""
 from copy import deepcopy
-from enum import Enum
 from typing import List
 
 import pytest
-from steamship import Steamship, File
+from steamship import Steamship
 
 from api_spec import Message
 from src.api import ChatAnalyticsApp
-from tests.utils import CONVERSATIONS, load_config, validate_response, check_successful_storage, \
-    check_if_space_is_empty, delete_files_in_space
+from tests.utils import CONVERSATIONS, validate_response, delete_files_in_space, check_if_space_is_empty, \
+    check_successful_storage
 
 ENVIRONMENT = "abbot"
 
@@ -19,8 +18,7 @@ def test_analyze(chat_stream: List[Message]) -> None:
     """Test analyze endpoint."""
     client = Steamship(profile=ENVIRONMENT)
 
-    config = load_config()
-    app = ChatAnalyticsApp(client, config=config)
+    app = ChatAnalyticsApp(client)
 
     response = app.analyze(
         chat_stream=[message.dict(format_dates=True, format_enums=True) for message in chat_stream]
@@ -33,8 +31,7 @@ def test_analyze(chat_stream: List[Message]) -> None:
 def test_analyze_threading_logic(chat_stream: List[Message]) -> None:
     """Test analyze endpoint."""
     client = Steamship(profile=ENVIRONMENT)
-    config = load_config()
-    app = ChatAnalyticsApp(client, config=config)
+    app = ChatAnalyticsApp(client)
 
     chat_stream_0 = deepcopy(chat_stream)
 
@@ -81,8 +78,7 @@ def test_analyze_threading_logic(chat_stream: List[Message]) -> None:
 @pytest.mark.parametrize("chat_stream", CONVERSATIONS)
 def test_add_examples(chat_stream: List[Message]) -> None:
     client = Steamship(profile=ENVIRONMENT)
-    config = load_config()
-    app = ChatAnalyticsApp(client, config=config)
+    app = ChatAnalyticsApp(client)
 
     # First we delete all the files in the space
     delete_files_in_space(client)
