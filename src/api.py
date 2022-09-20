@@ -8,43 +8,38 @@ from steamship import Block, File, PluginInstance, Steamship, Tag
 from steamship.app import App, Response, create_handler, post
 
 from api_spec import Intent, Message, Sentiment
-from keys import HF_API_BEARER_TOKEN, HF_MODEL_PATH, ONEAI_API_KEY
 
 PRIORITY_LABEL = "priority"
-
 
 class ChatAnalyticsApp(App):
     """App that transcribes and summarizes audio using Amazon Transcribe and OneAI skills."""
 
     ONEAI_TAGGER_HANDLE = "oneai-tagger"
-    ZERO_SHOT_TAGGER_HANDLE = "tagger-zero-shot"
+    ZERO_SHOT_TAGGER_HANDLE = "zero-shot-tagger-default"
+    HF_MODEL_PATH: str = "typeform/distilbert-base-uncased-mnli"
 
     def __init__(self, client: Steamship = None, config: Dict[str, Any] = None):
         super().__init__(client, config)
 
-        self.oneai_tagger = PluginInstance.create(
-            client,
+        self.oneai_tagger = client.use_plugin(
             plugin_handle=self.ONEAI_TAGGER_HANDLE,
-            handle=self.ONEAI_TAGGER_HANDLE,
+            instance_handle=self.ONEAI_TAGGER_HANDLE,
             config={
-                "api_key": ONEAI_API_KEY,
                 "skills": ",".join(["dialogue-segmentation", "sentiments"]),
             },
-        ).data
+        )
 
-        self.intent_tagger = PluginInstance.create(
-            client,
+        self.intent_tagger = client.use_plugin(
             plugin_handle=self.ZERO_SHOT_TAGGER_HANDLE,
-            handle=self.ZERO_SHOT_TAGGER_HANDLE,
+            instance_handle=self.ZERO_SHOT_TAGGER_HANDLE,
             config={
-                "hf_api_bearer_token": HF_API_BEARER_TOKEN,
-                "hf_model_path": HF_MODEL_PATH,
+                "hf_model_path": self.HF_MODEL_PATH,
                 "labels": "hello,praise,complaint,question,request,explanation",
                 "tag_kind": "intent",
                 "multi_label": False,
                 "use_gpu": False,
             },
-        ).data
+        )
 
     @post("analyze")
     def analyze(self, chat_stream: List[Dict[str, Any]]) -> List[Message]:
