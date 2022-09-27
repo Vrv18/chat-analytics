@@ -4,3 +4,4 @@ build
 src/keys.py
 src/.steamship/secrets.toml
 .steamship/secrets.toml
+.ipynb_checkpoints/
