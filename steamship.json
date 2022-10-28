@@ -13,5 +13,20 @@
     ]
   },
   "configTemplate": {
+  },
+  "steamshipRegistry": {
+    "tagline": "Find the threads, intents, and sentiments in unthreaded Slack and Discord chat logs.",
+    "tagline2": "Just provide windows of conversation and get back augmented data.",
+    "usefulFor": "Useful for companies building customer & community support tools that interact with chat rooms.",
+    "videoUrl": "https://www.youtube.com/watch?v=n8NgvECmq-M",
+    "githubUrl": "https://github.com/steamship-packages/chat-analytics-app",
+    "demoUrl": "https://steamship-packages-chat-analytics-demo-main-84871v.streamlitapp.com/",
+    "blogUrl": null,
+    "jupyterUrl": "https://github.com/steamship-packages/chat-analytics-app/blob/main/examples/chat-analytics-python-client-demo.ipynb",
+    "authorName": "Steamship",
+    "authorEmail": "hello@steamship.com",
+    "authorTwitter": "@GetSteamship",
+    "authorUrl": "https://www.steamship.com/",
+    "tags": ["Chat", "Discord", "Slack", "Customer Support", "Clustering", "Intent Classification"]
   }
 }
