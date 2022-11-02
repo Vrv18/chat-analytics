@@ -2,7 +2,7 @@
 from typing import List
 
 import pytest
-from steamship import App, AppInstance, Steamship
+from steamship import Steamship
 
 from api_spec import Message
 from tests.utils import (
@@ -10,18 +10,19 @@ from tests.utils import (
     check_if_space_is_empty,
     check_successful_storage,
     delete_files_in_space,
-    load_config,
     validate_response,
 )
 
-ENVIRONMENT = "prod"
-APP_HANDLE = "chat-analytics-app"
+ENVIRONMENT = "staging"
+APP_HANDLE = "chat-analytics"
 
 
 def _get_app_instance():
     client = Steamship(profile=ENVIRONMENT)
 
-    app_instance = AppInstance.create(client, app_handle=APP_HANDLE, handle=APP_HANDLE, upsert=True).data
+    app_instance = client.use(
+        package_handle=APP_HANDLE, reuse=False
+    )
     assert app_instance is not None
     assert app_instance.id is not None
 
@@ -33,7 +34,7 @@ def test_analyze(chat_stream: List[Message]) -> None:
     """Test analyze endpoint."""
     app_instance = _get_app_instance()
 
-    response = app_instance.post(
+    response = app_instance.invoke(
         "analyze",
         chat_stream=[message.dict(format_dates=True, format_enums=True) for message in chat_stream],
     )
@@ -53,7 +54,7 @@ def test_add_examples(chat_stream: List[Message]) -> None:
     # Then we check if it is really empty
     check_if_space_is_empty(client)
 
-    app_instance.post(
+    app_instance.invoke(
         "add_examples",
         chat_stream=[message.dict(format_dates=True, format_enums=True) for message in chat_stream],
     )

@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 from pydantic import parse_obj_as
 from steamship import File, Steamship
-from steamship.app import Response
+from steamship.invocable import InvocableResponse
 
 from api_spec import Intent, Message
 from tests import TEST_DATA
@@ -75,10 +75,12 @@ CONVERSATIONS = [
 ]
 
 
-def validate_response(chat_stream: List[Message], response: Response):
+def validate_response(chat_stream: List[Message], response: InvocableResponse) -> None:
     """Validate responses of the chat-analytics-app."""
-    processed_chat_stream = parse_obj_as(List[Message], response.data["chat_stream"])
-    assert response.data is not None
+    if isinstance(response, InvocableResponse):
+        response = response.data
+    processed_chat_stream = parse_obj_as(List[Message], response["chat_stream"])
+    assert response is not None
 
     last_root_message_id = None
     prediction_start_idx = 0
@@ -111,14 +113,14 @@ def validate_response(chat_stream: List[Message], response: Response):
 
 def check_successful_storage(chat_stream, client):
     """Check if the tags are correctly stored in the default space."""
-    assert len(File.query(client, "all").data.files) == 1
-    assert len(File.query(client, 'blocktag and kind "message_id"').data.files) == 1
-    assert len(File.query(client, 'blocktag and kind "user_id"').data.files) == 1
-    assert len(File.query(client, 'blocktag and kind "timestamp"').data.files) == 1
-    assert len(File.query(client, 'blocktag and kind "sentiments"').data.files) == 1
-    assert len(File.query(client, 'blocktag and kind "intent"').data.files) == 1
-    assert len(File.query(client, 'blocktag and kind "root_message_id"').data.files) == 1
-    file = File.query(client, "all").data.files[0]
+    assert len(File.query(client, "all").files) == 1
+    assert len(File.query(client, 'blocktag and kind "message_id"').files) == 1
+    assert len(File.query(client, 'blocktag and kind "user_id"').files) == 1
+    assert len(File.query(client, 'blocktag and kind "timestamp"').files) == 1
+    assert len(File.query(client, 'blocktag and kind "sentiments"').files) == 1
+    assert len(File.query(client, 'blocktag and kind "intent"').files) == 1
+    assert len(File.query(client, 'blocktag and kind "root_message_id"').files) == 1
+    file = File.query(client, "all").files[0]
     assert len(file.blocks) == len(chat_stream)
     for message, block in zip(chat_stream, file.blocks):
 
@@ -139,10 +141,10 @@ def check_successful_storage(chat_stream, client):
 
 def delete_files_in_space(client: Steamship) -> None:
     """Delete all files in the default space."""
-    for file in File.list(client).data.files:
+    for file in File.list(client).files:
         file.delete()
 
 
 def check_if_space_is_empty(client):
     """Check if default space is empty."""
-    assert len(File.query(client, "all").data.files) == 0
+    assert len(File.query(client, "all").files) == 0

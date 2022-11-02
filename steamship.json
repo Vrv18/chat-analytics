@@ -1,10 +1,10 @@
 {
-  "type": "app",
-  "name": "chat-analytics-app",
-  "handle": "chat-analytics-app",
-  "version": "0.0.18",
-  "description": "",
-  "author": "Steamship Inc.",
+  "type": "package",
+  "name": "chat-analytics",
+  "handle": "chat-analytics",
+  "version": "2.2.0",
+  "description": "Package to analyze and cluster chat streams.",
+  "author": "Steamship",
   "entrypoint": "src.api.handler",
   "build_config": {
     "ignore": [
@@ -13,5 +13,27 @@
     ]
   },
   "configTemplate": {
+  },
+  "steamshipRegistry": {
+    "tagline": "Analyze and cluster a stream of chat messages.",
+    "tagline2": "Make your chat rooms insightful by clustering discussions into topic-centered threads.",
+    "usefulFor": "Useful for anyone who needs to moderate the content of chat rooms.",
+    "videoUrl": "https://www.youtube.com/watch?v=n8NgvECmq-M",
+    "githubUrl": "https://github.com/steamship-packages/chat-analytics",
+    "demoUrl": "",
+    "blogUrl": "",
+    "jupyterUrl": "",
+    "authorName": "Steamship",
+    "authorEmail": "hello@steamship.com",
+    "authorTwitter": "@GetSteamship",
+    "authorUrl": "https://www.steamship.com/",
+    "tags": [
+      "Chat",
+      "Clustering",
+      "Sentiment",
+      "Slack",
+      "Discord",
+      "WhatsApp"
+    ]
   }
 }
