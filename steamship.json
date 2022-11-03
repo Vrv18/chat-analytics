@@ -1,11 +1,11 @@
 {
   "type": "package",
-  "name": "chat-analytics",
   "handle": "chat-analytics",
-  "version": "2.2.0",
-  "description": "Package to analyze and cluster chat streams.",
-  "author": "Steamship",
-  "entrypoint": "src.api.handler",
+  "version": "2.2.2",
+  "description": "For companies building software to help support reps manage their community chatrooms. Clusters a chat logs into topic groups and extracts sentiment and entities.",
+  "author": "Steamship Inc.",
+  "entrypoint": "api.handler",
+  "public": true,
   "build_config": {
     "ignore": [
       "tests",
@@ -15,25 +15,18 @@
   "configTemplate": {
   },
   "steamshipRegistry": {
-    "tagline": "Analyze and cluster a stream of chat messages.",
-    "tagline2": "Make your chat rooms insightful by clustering discussions into topic-centered threads.",
-    "usefulFor": "Useful for anyone who needs to moderate the content of chat rooms.",
+    "tagline": "Find the threads, intents, and sentiments in unthreaded Slack and Discord chat logs.",
+    "tagline2": "Just provide windows of conversation and get back augmented data.",
+    "usefulFor": "Useful for companies building customer & community support tools that interact with chat rooms.",
     "videoUrl": "https://www.youtube.com/watch?v=n8NgvECmq-M",
-    "githubUrl": "https://github.com/steamship-packages/chat-analytics",
-    "demoUrl": "",
-    "blogUrl": "",
-    "jupyterUrl": "",
+    "githubUrl": "https://github.com/steamship-packages/chat-analytics-app",
+    "demoUrl": "https://steamship-packages-chat-analytics-demo-main-84871v.streamlitapp.com/",
+    "blogUrl": null,
+    "jupyterUrl": "https://github.com/steamship-packages/chat-analytics-app/blob/main/examples/chat-analytics-python-client-demo.ipynb",
     "authorName": "Steamship",
     "authorEmail": "hello@steamship.com",
     "authorTwitter": "@GetSteamship",
     "authorUrl": "https://www.steamship.com/",
-    "tags": [
-      "Chat",
-      "Clustering",
-      "Sentiment",
-      "Slack",
-      "Discord",
-      "WhatsApp"
-    ]
+    "tags": ["Chat", "Discord", "Slack", "Customer Support", "Clustering", "Intent Classification"]
   }
 }

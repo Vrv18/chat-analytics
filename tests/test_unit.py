@@ -42,6 +42,12 @@ def test_analyze_threading_logic(chat_stream: List[Message]) -> None:
 
     chat_stream_0[0].root_message_id = "1"
 
+    message_input = [
+        message.dict(format_dates=True, format_enums=True) for message in chat_stream_0
+    ]
+    import json
+    print(json.dumps(message_input))
+
     response = app.analyze(
         chat_stream=[
             message.dict(format_dates=True, format_enums=True) for message in chat_stream_0
