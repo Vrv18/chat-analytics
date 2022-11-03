@@ -1,17 +1,17 @@
-"""Integration tests for the chat-analytics-app."""
-from typing import List
-
-import pytest
-from steamship import Steamship
-
-from api_spec import Message
-from tests.utils import (
+"""Integration test for the chat-analytics-app."""
+from test.utils import (
     CONVERSATIONS,
     check_if_space_is_empty,
     check_successful_storage,
     delete_files_in_space,
     validate_response,
 )
+from typing import List
+
+import pytest
+from steamship import Steamship
+
+from api_spec import Message
 
 ENVIRONMENT = "staging"
 APP_HANDLE = "chat-analytics"
@@ -20,9 +20,7 @@ APP_HANDLE = "chat-analytics"
 def _get_app_instance():
     client = Steamship(profile=ENVIRONMENT)
 
-    app_instance = client.use(
-        package_handle=APP_HANDLE, reuse=False
-    )
+    app_instance = client.use(package_handle=APP_HANDLE, reuse=False)
     assert app_instance is not None
     assert app_instance.id is not None
 

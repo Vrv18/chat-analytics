@@ -1,3 +1,7 @@
+"""Example of a unthreaded chat conversation."""
+from datetime import datetime
+
+from api_spec import Intent, Message
 
 CONVERSATIONS = [
     [

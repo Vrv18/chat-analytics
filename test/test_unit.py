@@ -1,5 +1,12 @@
-"""Test zendesk-ticket-urgency via unit tests."""
+"""Test zendesk-ticket-urgency via unit test."""
 from copy import deepcopy
+from test.utils import (
+    CONVERSATIONS,
+    check_if_space_is_empty,
+    check_successful_storage,
+    delete_files_in_space,
+    validate_response,
+)
 from typing import List
 
 import pytest
@@ -7,13 +14,6 @@ from steamship import Steamship
 
 from api_spec import Message
 from src.api import ChatAnalyticsPackage
-from tests.utils import (
-    CONVERSATIONS,
-    check_if_space_is_empty,
-    check_successful_storage,
-    delete_files_in_space,
-    validate_response,
-)
 
 ENVIRONMENT = "staging"
 
@@ -46,6 +46,7 @@ def test_analyze_threading_logic(chat_stream: List[Message]) -> None:
         message.dict(format_dates=True, format_enums=True) for message in chat_stream_0
     ]
     import json
+
     print(json.dumps(message_input))
 
     response = app.analyze(

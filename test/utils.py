@@ -2,6 +2,7 @@
 import json
 from datetime import datetime
 from enum import Enum
+from test import TEST_DATA
 from typing import Any, Dict, List
 
 from pydantic import parse_obj_as
@@ -9,7 +10,6 @@ from steamship import File, Steamship
 from steamship.invocable import InvocableResponse
 
 from api_spec import Intent, Message
-from tests import TEST_DATA
 
 
 def load_config() -> Dict[str, Any]:
