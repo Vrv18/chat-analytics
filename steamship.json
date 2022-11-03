@@ -1,7 +1,7 @@
 {
-  "type": "app",
+  "type": "package",
   "handle": "chat-analytics",
-  "version": "1.0.4",
+  "version": "2.2.2",
   "description": "For companies building software to help support reps manage their community chatrooms. Clusters a chat logs into topic groups and extracts sentiment and entities.",
   "author": "Steamship Inc.",
   "entrypoint": "api.handler",

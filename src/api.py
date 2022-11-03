@@ -1,29 +1,34 @@
 """App that summarizes meetings using Amazon Transcribe and OneAI skills."""
 from collections import Counter
 from itertools import zip_longest
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Type
 
 from pydantic import parse_obj_as
-from steamship import Block, File, PluginInstance, Steamship, Tag
-from steamship.app import App, Response, create_handler, post
+from steamship import Block, File, Steamship, Tag
+from steamship.invocable import Config, InvocableResponse, PackageService, create_handler, post
 
 from api_spec import Intent, Message, Sentiment
 
-PRIORITY_LABEL = "priority"
+PRIORITY_LABEL: str = "priority"
+HF_MODEL_PATH: str = "typeform/distilbert-base-uncased-mnli"
 
-class ChatAnalyticsApp(App):
+
+class ChatAnalyticsPackage(PackageService):
     """App that transcribes and summarizes audio using Amazon Transcribe and OneAI skills."""
+
+    def config_cls(self) -> Type[Config]:
+        """Config used to initialize a ChatAnalyticsPackage."""
+        return Config
 
     ONEAI_TAGGER_HANDLE = "oneai-tagger"
     ZERO_SHOT_TAGGER_HANDLE = "zero-shot-tagger-default"
-    HF_MODEL_PATH: str = "typeform/distilbert-base-uncased-mnli"
 
     def __init__(self, client: Steamship = None, config: Dict[str, Any] = None):
         super().__init__(client, config)
 
         self.oneai_tagger = client.use_plugin(
             plugin_handle=self.ONEAI_TAGGER_HANDLE,
-            instance_handle=self.ONEAI_TAGGER_HANDLE,
+            instance_handle=self.ONEAI_TAGGER_HANDLE + "1",
             config={
                 "skills": ",".join(["dialogue-segmentation", "sentiments"]),
             },
@@ -31,9 +36,9 @@ class ChatAnalyticsApp(App):
 
         self.intent_tagger = client.use_plugin(
             plugin_handle=self.ZERO_SHOT_TAGGER_HANDLE,
-            instance_handle=self.ZERO_SHOT_TAGGER_HANDLE,
+            instance_handle=self.ZERO_SHOT_TAGGER_HANDLE + "1",
             config={
-                "hf_model_path": self.HF_MODEL_PATH,
+                "hf_model_path": HF_MODEL_PATH,
                 "labels": "hello,praise,complaint,question,request,explanation",
                 "tag_kind": "intent",
                 "multi_label": False,
@@ -42,7 +47,7 @@ class ChatAnalyticsApp(App):
         )
 
     @post("analyze")
-    def analyze(self, chat_stream: List[Dict[str, Any]]) -> List[Message]:
+    def analyze(self, chat_stream: List[Dict[str, Any]]) -> InvocableResponse[List[Message]]:
         """Analyze a stream of chat messages and add useful features."""
         chat_stream = self._parse_input(chat_stream)
 
@@ -79,14 +84,14 @@ class ChatAnalyticsApp(App):
             ],
         )
 
-        tag_result_oneai = self.oneai_tagger.tag(doc=single_block_file)
-        tag_result_intent = self.intent_tagger.tag(doc=multi_block_file)
+        tag_result_oneai_task = self.oneai_tagger.tag(doc=single_block_file)
+        tag_result_intent_task = self.intent_tagger.tag(doc=multi_block_file)
 
-        tag_result_oneai.wait(retry_delay_s=0.05)
-        single_block_file = tag_result_oneai.data.file
+        tag_result_oneai_task.wait()
+        single_block_file = tag_result_oneai_task.output.file
 
-        tag_result_intent.wait(retry_delay_s=0.05)
-        multi_block_file = tag_result_intent.data.file
+        tag_result_intent_task.wait()
+        multi_block_file = tag_result_intent_task.output.file
 
         thread_tags = sorted(
             [
@@ -143,7 +148,7 @@ class ChatAnalyticsApp(App):
 
             i += len(message.text) + 1
 
-        return Response(
+        return InvocableResponse(
             json={
                 "chat_stream": [
                     message.dict(format_dates=True, format_enums=True) for message in chat_stream
@@ -157,7 +162,7 @@ class ChatAnalyticsApp(App):
         return chat_stream
 
     @post("add_examples")
-    def add_examples(self, chat_stream: List[Message]) -> Response:
+    def add_examples(self, chat_stream: List[Message]) -> InvocableResponse:
         """Add examples for the AI to train on."""
         chat_stream = self._parse_input(chat_stream)
 
@@ -168,7 +173,7 @@ class ChatAnalyticsApp(App):
                 for message in chat_stream
             ],
         )
-        return Response(string="Successfully uploaded examples.")
+        return InvocableResponse(string="Successfully uploaded examples.")
 
 
-handler = create_handler(ChatAnalyticsApp)
+handler = create_handler(ChatAnalyticsPackage)

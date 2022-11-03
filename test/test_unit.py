@@ -1,16 +1,21 @@
-"""Test zendesk-ticket-urgency via unit tests."""
+"""Test zendesk-ticket-urgency via unit test."""
 from copy import deepcopy
+from test.utils import (
+    CONVERSATIONS,
+    check_if_space_is_empty,
+    check_successful_storage,
+    delete_files_in_space,
+    validate_response,
+)
 from typing import List
 
 import pytest
 from steamship import Steamship
 
 from api_spec import Message
-from src.api import ChatAnalyticsApp
-from tests.utils import CONVERSATIONS, validate_response, delete_files_in_space, check_if_space_is_empty, \
-    check_successful_storage
+from src.api import ChatAnalyticsPackage
 
-ENVIRONMENT = "abbot"
+ENVIRONMENT = "staging"
 
 
 @pytest.mark.parametrize("chat_stream", CONVERSATIONS)
@@ -18,7 +23,7 @@ def test_analyze(chat_stream: List[Message]) -> None:
     """Test analyze endpoint."""
     client = Steamship(profile=ENVIRONMENT)
 
-    app = ChatAnalyticsApp(client)
+    app = ChatAnalyticsPackage(client)
 
     response = app.analyze(
         chat_stream=[message.dict(format_dates=True, format_enums=True) for message in chat_stream]
@@ -31,7 +36,7 @@ def test_analyze(chat_stream: List[Message]) -> None:
 def test_analyze_threading_logic(chat_stream: List[Message]) -> None:
     """Test analyze endpoint."""
     client = Steamship(profile=ENVIRONMENT)
-    app = ChatAnalyticsApp(client)
+    app = ChatAnalyticsPackage(client)
 
     chat_stream_0 = deepcopy(chat_stream)
 
@@ -41,6 +46,7 @@ def test_analyze_threading_logic(chat_stream: List[Message]) -> None:
         message.dict(format_dates=True, format_enums=True) for message in chat_stream_0
     ]
     import json
+
     print(json.dumps(message_input))
 
     response = app.analyze(
@@ -83,8 +89,9 @@ def test_analyze_threading_logic(chat_stream: List[Message]) -> None:
 
 @pytest.mark.parametrize("chat_stream", CONVERSATIONS)
 def test_add_examples(chat_stream: List[Message]) -> None:
+    """Test add_examples endpoint."""
     client = Steamship(profile=ENVIRONMENT)
-    app = ChatAnalyticsApp(client)
+    app = ChatAnalyticsPackage(client)
 
     # First we delete all the files in the space
     delete_files_in_space(client)
@@ -93,9 +100,7 @@ def test_add_examples(chat_stream: List[Message]) -> None:
     check_if_space_is_empty(client)
 
     app.add_examples(
-        chat_stream=[
-            message.dict(format_dates=True, format_enums=True) for message in chat_stream
-        ]
+        chat_stream=[message.dict(format_dates=True, format_enums=True) for message in chat_stream]
     )
 
     check_successful_storage(chat_stream, client)
