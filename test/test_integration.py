@@ -1,4 +1,7 @@
 """Integration test for the chat-analytics-app."""
+import random
+import string
+
 from test.utils import (
     CONVERSATIONS,
     check_if_space_is_empty,
@@ -13,14 +16,23 @@ from steamship import Steamship
 
 from api_spec import Message
 
-ENVIRONMENT = "staging"
+ENVIRONMENT = "prod"
 APP_HANDLE = "chat-analytics"
 
 
-def _get_app_instance():
+def random_name() -> str:
+    """Returns a random name suitable for a handle that has low likelihood of colliding with another.
+
+    Output format matches test_[a-z0-9]+, which should be a valid handle.
+    """
+    letters = string.digits + string.ascii_letters
+    return f"test_{''.join(random.choice(letters) for _ in range(10))}".lower()  # noqa: S311
+
+
+def _get_app_instance(): 
     client = Steamship(profile=ENVIRONMENT)
 
-    app_instance = client.use(package_handle=APP_HANDLE, reuse=False)
+    app_instance = client.use(package_handle=APP_HANDLE, instance_handle=random_name(), fetch_if_exists=False)
     assert app_instance is not None
     assert app_instance.id is not None
 
